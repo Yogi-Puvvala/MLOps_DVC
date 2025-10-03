@@ -1,5 +1,5 @@
 stages:
-  model_ingestion:
+  data_ingestion:
     cmd: python src/data_ingestion.py
     deps:
       - src/data_ingestion.py

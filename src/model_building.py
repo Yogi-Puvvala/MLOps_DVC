@@ -1,84 +1,103 @@
 import pandas as pd
-import mlflow
 import os
-from sklearn.feature_extraction.text import TfidfVectorizer
+import mlflow
 from sklearn.model_selection import train_test_split
-from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
-from sklearn.neighbors import KNeighborsClassifier
+from sklearn.compose import ColumnTransformer
+from sklearn.feature_extraction.text import HashingVectorizer, TfidfVectorizer
+from sklearn.linear_model import SGDClassifier, PassiveAggressiveClassifier
 from sklearn.naive_bayes import MultinomialNB
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 
+# -------------------------------
+# Load Data
+# -------------------------------
 X = pd.read_csv("data/raw/X.csv")
-y = pd.read_csv("data/raw/y.csv")
+y = pd.read_csv("data/raw/y.csv").iloc[:, 0]  # ensure y is 1D
 
+text_col = "clean_comment"
+X[text_col] = X[text_col].fillna("")
+
+# -------------------------------
+# Train/Test Split
+# -------------------------------
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.25, random_state=42
 )
 
-preprocessing = ColumnTransformer([
-    ("comments", TfidfVectorizer(), "clean_comment")  # no need for list here
+# -------------------------------
+# Preprocessing
+# -------------------------------
+# HashingVectorizer is memory-friendly for large datasets
+preprocessing_hash = ColumnTransformer([
+    ("text", HashingVectorizer(n_features=5000, alternate_sign=False), text_col)
 ])
 
+# TF-IDF for MultinomialNB with limited max_features
+preprocessing_tfidf = ColumnTransformer([
+    ("text", TfidfVectorizer(max_features=5000), text_col)
+])
+
+# -------------------------------
+# Define Models
+# -------------------------------
 Models = {}
 
-# KNC Model
-
-KNC = Pipeline([
-    ("preprocessing", preprocessing),
-    ("model", KNeighborsClassifier())
+# 1️⃣ SGDClassifier
+sgd = Pipeline([
+    ("preprocessing", preprocessing_hash),
+    ("model", SGDClassifier(loss="log_loss", max_iter=500, tol=1e-3, random_state=42))
 ])
-KNC.fit(X_train, y_train)
-Models["KNC"] = KNC
+sgd.fit(X_train, y_train)
+Models["SGD"] = sgd
 
-# NBC Model
+# 2️⃣ Passive Aggressive Classifier
+pac = Pipeline([
+    ("preprocessing", preprocessing_hash),
+    ("model", PassiveAggressiveClassifier(max_iter=500, random_state=42))
+])
+pac.fit(X_train, y_train)
+Models["PAC"] = pac
 
-NBC = Pipeline([
-    ("preprocessing", preprocessing),
+# 3️⃣ MultinomialNB
+mnb = Pipeline([
+    ("preprocessing", preprocessing_tfidf),
     ("model", MultinomialNB())
 ])
-NBC.fit(X_train, y_train)
-Models["NBC"] = NBC
+mnb.fit(X_train, y_train)
+Models["MNB"] = mnb
 
-# RFC Model
+# -------------------------------
+# Save combined CSV for MLflow
+# -------------------------------
+df = pd.concat([X, y.rename("target")], axis=1)
+df.to_csv("reddit.csv", index=False)
 
-RFC = Pipeline([
-    ("preprocessing", preprocessing),
-    ("model", RandomForestClassifier())
-])
-RFC.fit(X_train, y_train)
-Models["RFC"] = RFC
-
-df = pd.concat([X, y], axis = 1)
-df.to_csv("reddit.csv")
-
+# -------------------------------
+# MLflow Logging
+# -------------------------------
 mlflow.set_experiment("E2E_DVC")
 mlflow.set_tracking_uri("http://127.0.0.1:5000/")
 
 for model_name, model in Models.items():
-    with mlflow.start_run(run_name = model_name):
-        # log params
-        model_params = model.get_params()
-        mlflow.log_params(model_params)
-
-        # log metrics
-        pred_vals = model.predict(X_test)
+    with mlflow.start_run(run_name=model_name):
+        mlflow.log_params(model.get_params())
+        y_pred = model.predict(X_test)
         mlflow.log_metrics({
-            "accuracy": accuracy_score(y_test, pred_vals),
-            "precision": precision_score(y_test, pred_vals, average = "macro"),
-            "recall": recall_score(y_test, pred_vals, average = "macro")
+            "accuracy": accuracy_score(y_test, y_pred),
+            "precision": precision_score(y_test, y_pred, average="macro"),
+            "recall": recall_score(y_test, y_pred, average="macro")
         })
-
-        # log model
-        mlflow.sklearn.log_model(model, artifact_path = model_name)
-
-        # log artifacts
+        mlflow.sklearn.log_model(model, artifact_path=model_name)
         mlflow.log_artifacts("reddit.csv")
 
+# -------------------------------
+# Save train/test splits
+# -------------------------------
 os.makedirs("data/split", exist_ok=True)
+X_train.to_csv("data/split/X_train.csv", index=False)
+X_test.to_csv("data/split/X_test.csv", index=False)
+y_train.to_csv("data/split/y_train.csv", index=False)
+y_test.to_csv("data/split/y_test.csv", index=False)
 
-X_train.to_csv("data/split/X_train.csv")
-X_test.to_csv("data/split/X_test.csv")
-y_train.to_csv("data/split/y_train.csv")
-y_test.to_csv("data/split/y_test.csv")
+print("Models trained successfully and splits saved!")

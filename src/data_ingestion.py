@@ -7,7 +7,8 @@ df = pd.read_csv("https://raw.githubusercontent.com/Himanshu-1703/reddit-sentime
 X = df.drop("category", axis = 1)
 y = df["category"]
 
-X["clean_comment"] = X["clean_comment"].astype(str).str.strip().str.lower()
+
+X["clean_comment"] = X["clean_comment"].apply(lambda x: "".join(str(x).split()).lower())
 X = X[X["clean_comment"] != ""]
 y = y.loc[X.index]  
 
