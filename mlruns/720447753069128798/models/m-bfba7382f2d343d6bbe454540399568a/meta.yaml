@@ -1,0 +1,10 @@
+artifact_location: file:///C:/Users/yogip/OneDrive/Desktop/E2E_with_DVC/mlruns/720447753069128798/models/m-bfba7382f2d343d6bbe454540399568a/artifacts
+creation_timestamp: 1759514437066
+experiment_id: '720447753069128798'
+last_updated_timestamp: 1759514441327
+model_id: m-bfba7382f2d343d6bbe454540399568a
+model_type: ''
+name: NBC
+source_run_id: 6eba743bb38c40c1b951c689f9512a5e
+status: 2
+status_message: null

@@ -1,0 +1,10 @@
+artifact_location: file:///C:/Users/yogip/OneDrive/Desktop/E2E_with_DVC/mlruns/720447753069128798/models/m-3a1fe5a98bd6479f9a2f863e0c7b3d62/artifacts
+creation_timestamp: 1759514442611
+experiment_id: '720447753069128798'
+last_updated_timestamp: 1759514446868
+model_id: m-3a1fe5a98bd6479f9a2f863e0c7b3d62
+model_type: ''
+name: RFC
+source_run_id: 214ab7f6feaa47868614efb85221518f
+status: 2
+status_message: null

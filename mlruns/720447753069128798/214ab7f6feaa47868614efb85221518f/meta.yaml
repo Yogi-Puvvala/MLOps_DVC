@@ -1,0 +1,14 @@
+artifact_uri: file:///C:/Users/yogip/OneDrive/Desktop/E2E_with_DVC/mlruns/720447753069128798/214ab7f6feaa47868614efb85221518f/artifacts
+end_time: 1759514446939
+entry_point_name: ''
+experiment_id: '720447753069128798'
+lifecycle_stage: active
+run_id: 214ab7f6feaa47868614efb85221518f
+run_name: RFC
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1759514441404
+status: 3
+tags: []
+user_id: yogip

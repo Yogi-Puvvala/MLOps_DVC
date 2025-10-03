@@ -1,0 +1,10 @@
+artifact_location: file:///C:/Users/yogip/OneDrive/Desktop/E2E_with_DVC/mlruns/720447753069128798/models/m-c9782bd7083249d0867f10d96a4476dc/artifacts
+creation_timestamp: 1759514239424
+experiment_id: '720447753069128798'
+last_updated_timestamp: 1759514248882
+model_id: m-c9782bd7083249d0867f10d96a4476dc
+model_type: ''
+name: KNC
+source_run_id: fb4f8c720ff847ae8db0f7d804856bd4
+status: 2
+status_message: null

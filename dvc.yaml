@@ -1,0 +1,23 @@
+stages:
+  model_ingestion:
+    cmd: python src/data_ingestion.py
+    deps:
+      - src/data_ingestion.py
+    outs:
+      - data/raw
+
+  model_building:
+    cmd: python src/model_building.py
+    deps:
+      - data/raw
+      - src/model_building.py
+    outs:
+      - data/split
+
+  model_evaluation:
+    cmd: python src/model_evaluation.py   # <-- fixed here
+    deps:
+      - data/split
+      - src/model_evaluation.py
+    outs:
+      - data/metrics

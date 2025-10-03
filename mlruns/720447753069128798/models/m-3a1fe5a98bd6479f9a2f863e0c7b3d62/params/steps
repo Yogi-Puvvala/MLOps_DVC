@@ -1,0 +1,2 @@
+[('preprocessing', ColumnTransformer(transformers=[('comments', TfidfVectorizer(),
+                                 'clean_comment')])), ('model', RandomForestClassifier())]

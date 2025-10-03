@@ -1,0 +1,14 @@
+artifact_uri: file:///C:/Users/yogip/OneDrive/Desktop/E2E_with_DVC/mlruns/720447753069128798/6eba743bb38c40c1b951c689f9512a5e/artifacts
+end_time: 1759514441371
+entry_point_name: ''
+experiment_id: '720447753069128798'
+lifecycle_stage: active
+run_id: 6eba743bb38c40c1b951c689f9512a5e
+run_name: NBC
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1759514436638
+status: 3
+tags: []
+user_id: yogip

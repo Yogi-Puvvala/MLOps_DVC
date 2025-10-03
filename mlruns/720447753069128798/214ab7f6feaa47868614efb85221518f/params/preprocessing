@@ -1,0 +1,2 @@
+ColumnTransformer(transformers=[('comments', TfidfVectorizer(),
+                                 'clean_comment')])

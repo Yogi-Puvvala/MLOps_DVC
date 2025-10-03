@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/yogip/OneDrive/Desktop/E2E_with_DVC/mlruns/720447753069128798/1f12543e434845d4813dc2871afb1180/artifacts
+deleted_time: 1759514226521
+end_time: 1759514156689
+entry_point_name: ''
+experiment_id: '720447753069128798'
+lifecycle_stage: deleted
+run_id: 1f12543e434845d4813dc2871afb1180
+run_name: KNC
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1759514149108
+status: 4
+tags: []
+user_id: yogip
