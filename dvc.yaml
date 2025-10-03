@@ -15,7 +15,7 @@ stages:
       - data/split
 
   model_evaluation:
-    cmd: python src/model_evaluation.py   # <-- fixed here
+    cmd: python src/model_evaluation.py   
     deps:
       - data/split
       - src/model_evaluation.py
