@@ -1,0 +1,35 @@
+name: DVC Pipeline CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  run-dvc:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup checkout
+      - uses: action/checkout@v3
+
+      - name: Setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+
+      - name: Pull data from DVC remote
+        run: dvc pull
+
+      - name: Reproduce DVC Pipeline
+        run: dvc repro
+
+      - name: Push updated data and metrics
+        run: |
+          git add .
+          git commit -m "Auto-Update from CI"
+          git push origin main
+          dvc push
