@@ -4,3 +4,4 @@ pandas
 numpy
 dvc
 PyYAML
+mlflow
