@@ -18,7 +18,7 @@ stages:
     deps:
     - path: src/data_ingestion.py
       hash: md5
-      md5: 0f58f008d54f1970774c3e97ceef619e
+      md5: 565224cc0777716458aa438d32946824
       size: 2023
     outs:
     - path: data/raw
