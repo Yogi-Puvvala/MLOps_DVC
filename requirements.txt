@@ -1,5 +1,5 @@
 scikit-learn
-xgboost
+streamlit
 pandas
 numpy
 dvc

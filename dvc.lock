@@ -54,11 +54,11 @@ stages:
       nfiles: 4
     - path: src/model_evaluation.py
       hash: md5
-      md5: 856978b15940db91236acd6e94d2d8d3
-      size: 1064
+      md5: e3d73a4e54a5b4733b4c5ec648fd95db
+      size: 1155
     outs:
-    - path: data/metrics
+    - path: data/model
       hash: md5
-      md5: c56e03104ad7a1b9a5055761cdff8ac0.dir
-      size: 81
-      nfiles: 1
+      md5: 8806693726c98d4888dd3514073659d0.dir
+      size: 4647
+      nfiles: 2

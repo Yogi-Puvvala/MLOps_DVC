@@ -20,4 +20,4 @@ stages:
       - data/split
       - src/model_evaluation.py
     outs:
-      - data/metrics
+      - data/model

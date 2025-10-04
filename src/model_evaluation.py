@@ -2,6 +2,7 @@ import mlflow
 import pandas as pd
 import json
 import os
+import pickle
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 
 client = mlflow.MlflowClient()
@@ -34,7 +35,10 @@ metrics = {
     "Recall": precision_score(y_test, pred_vals, average="macro")
 }
 
-os.makedirs("data/metrics", exist_ok=True)
+os.makedirs("data/model", exist_ok=True)
 
-with open("data/metrics/metrics.json", "w") as file:
+with open("data/model/metrics.json", "w") as file:
     json.dump(metrics, file)
+
+with open("data/model/mod.pkl", "wb") as file:
+    pickle.dump(model, file)
