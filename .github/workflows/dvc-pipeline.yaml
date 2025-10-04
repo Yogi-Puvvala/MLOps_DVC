@@ -26,7 +26,7 @@ jobs:
           pip install "dvc[s3]"  # include S3 support
 
       - name: Pull data from DVC remote
-        run: dvc pull || echo "Warning: Some cache files missing, continuing..."
+        run: dvc pull || echo "Warning Some cache files missing, continuing..."
 
       - name: Reproduce DVC Pipeline
         run: dvc repro
