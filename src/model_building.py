@@ -4,78 +4,74 @@ import mlflow
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
-from sklearn.feature_extraction.text import HashingVectorizer, TfidfVectorizer
-from sklearn.linear_model import SGDClassifier, PassiveAggressiveClassifier
-from sklearn.naive_bayes import MultinomialNB
+from sklearn.preprocessing import StandardScaler, OneHotEncoder, OrdinalEncoder
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 
-# -------------------------------
-# Load Data
-# -------------------------------
+# Load features and target
 X = pd.read_csv("data/raw/X.csv")
-y = pd.read_csv("data/raw/y.csv").iloc[:, 0]  # ensure y is 1D
+y = pd.read_csv("data/raw/y.csv")
 
-text_col = "clean_comment"
-X[text_col] = X[text_col].fillna("")
+# Extract correct target column
+if "insurance_premium_category" in y.columns:
+    y = y["insurance_premium_category"]
+else:
+    raise ValueError("Expected column 'insurance_premium_category' not found in target file.")
 
-# -------------------------------
-# Train/Test Split
-# -------------------------------
+# Train-test split
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.25, random_state=42
 )
 
-# -------------------------------
-# Preprocessing
-# -------------------------------
-# HashingVectorizer is memory-friendly for large datasets
-preprocessing_hash = ColumnTransformer([
-    ("text", HashingVectorizer(n_features=5000, alternate_sign=False), text_col)
+# Column groups
+numerical = ["income_lpa", "bmi"]
+nominal = ["occupation"]
+ordinal = ["lifestyle_risk", "age_group", "city_tier"]
+
+ordinal_categories = [
+    ["low", "medium", "high"],                      # lifestyle_risk
+    ["young", "adult", "middle_aged", "senior"],   # age_group
+    ["1", "2", "3"]                                 # city_tier
+]
+
+# Preprocessing for LR and KNC
+preprocessing = ColumnTransformer([
+    ("num", StandardScaler(), numerical),
+    ("cat", OneHotEncoder(handle_unknown="ignore", sparse_output=False), nominal),
+    ("ord", OrdinalEncoder(categories=ordinal_categories), ordinal)
 ])
 
-# TF-IDF for MultinomialNB with limited max_features
-preprocessing_tfidf = ColumnTransformer([
-    ("text", TfidfVectorizer(max_features=5000), text_col)
+# Preprocessing for RFC (passthrough numerical)
+preprocessing_rfc = ColumnTransformer([
+    ("num", "passthrough", numerical),
+    ("cat", OneHotEncoder(handle_unknown="ignore", sparse_output=False), nominal),
+    ("ord", OrdinalEncoder(categories=ordinal_categories), ordinal)
 ])
 
-# -------------------------------
-# Define Models
-# -------------------------------
+# Model pipelines
 Models = {}
 
-# 1️⃣ SGDClassifier
-sgd = Pipeline([
-    ("preprocessing", preprocessing_hash),
-    ("model", SGDClassifier(loss="log_loss", max_iter=500, tol=1e-3, random_state=42))
+Models["LR"] = Pipeline([
+    ("preprocessing", preprocessing),
+    ("model", LogisticRegression())
 ])
-sgd.fit(X_train, y_train)
-Models["SGD"] = sgd
+Models["LR"].fit(X_train, y_train)
 
-# 2️⃣ Passive Aggressive Classifier
-pac = Pipeline([
-    ("preprocessing", preprocessing_hash),
-    ("model", PassiveAggressiveClassifier(max_iter=500, random_state=42))
+Models["KNC"] = Pipeline([
+    ("preprocessing", preprocessing),
+    ("model", KNeighborsClassifier())
 ])
-pac.fit(X_train, y_train)
-Models["PAC"] = pac
+Models["KNC"].fit(X_train, y_train)
 
-# 3️⃣ MultinomialNB
-mnb = Pipeline([
-    ("preprocessing", preprocessing_tfidf),
-    ("model", MultinomialNB())
+Models["RFC"] = Pipeline([
+    ("preprocessing", preprocessing_rfc),
+    ("model", RandomForestClassifier())
 ])
-mnb.fit(X_train, y_train)
-Models["MNB"] = mnb
+Models["RFC"].fit(X_train, y_train)
 
-# -------------------------------
-# Save combined CSV for MLflow
-# -------------------------------
-df = pd.concat([X, y.rename("target")], axis=1)
-df.to_csv("reddit.csv", index=False)
-
-# -------------------------------
-# MLflow Logging
-# -------------------------------
+# MLflow setup
 mlflow.set_experiment("E2E_DVC")
 mlflow.set_tracking_uri("http://127.0.0.1:5000/")
 
@@ -89,11 +85,9 @@ for model_name, model in Models.items():
             "recall": recall_score(y_test, y_pred, average="macro")
         })
         mlflow.sklearn.log_model(model, artifact_path=model_name)
-        mlflow.log_artifacts("reddit.csv")
+        mlflow.log_artifacts("insurance.csv")
 
-# -------------------------------
-# Save train/test splits
-# -------------------------------
+# Save splits
 os.makedirs("data/split", exist_ok=True)
 X_train.to_csv("data/split/X_train.csv", index=False)
 X_test.to_csv("data/split/X_test.csv", index=False)

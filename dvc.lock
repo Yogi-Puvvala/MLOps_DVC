@@ -18,11 +18,47 @@ stages:
     deps:
     - path: src/data_ingestion.py
       hash: md5
-      md5: 1de5327c671debcbe5efa043c4ef5818
-      size: 487
+      md5: 565224cc0777716458aa438d32946824
+      size: 2023
     outs:
     - path: data/raw
       hash: md5
-      md5: eb58a3f8872ce404681eef70c58e7b49.dir
-      size: 6286780
+      md5: ec2cc3ef41b08a628e0a02f7bb78fb4c.dir
+      size: 6563
       nfiles: 2
+  model_building:
+    cmd: python src/model_building.py
+    deps:
+    - path: data/raw
+      hash: md5
+      md5: ec2cc3ef41b08a628e0a02f7bb78fb4c.dir
+      size: 6563
+      nfiles: 2
+    - path: src/model_building.py
+      hash: md5
+      md5: 3dfc3b5c7f5b2fe150695af852cacf77
+      size: 3330
+    outs:
+    - path: data/split
+      hash: md5
+      md5: 28dfb26f86542062a35bd7063f763969.dir
+      size: 6351
+      nfiles: 4
+  model_evaluation:
+    cmd: python src/model_evaluation.py
+    deps:
+    - path: data/split
+      hash: md5
+      md5: 28dfb26f86542062a35bd7063f763969.dir
+      size: 6351
+      nfiles: 4
+    - path: src/model_evaluation.py
+      hash: md5
+      md5: 856978b15940db91236acd6e94d2d8d3
+      size: 1064
+    outs:
+    - path: data/metrics
+      hash: md5
+      md5: c56e03104ad7a1b9a5055761cdff8ac0.dir
+      size: 81
+      nfiles: 1
