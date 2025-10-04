@@ -23,6 +23,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install "dvc[s3]"  # include S3 support
 
       - name: Pull data from DVC remote
         run: dvc pull
@@ -30,9 +31,11 @@ jobs:
       - name: Reproduce DVC Pipeline
         run: dvc repro
 
-      - name: Push updated data and metrics
+      - name: Commit and push metadata
         run: |
           git add .
           git commit -m "Auto-update from CI" || echo "No changes to commit"
           git push origin main
-          dvc push
+
+      - name: Push updated data and metrics
+        run: dvc push
