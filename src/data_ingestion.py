@@ -39,11 +39,11 @@ def age_group(age) -> str:
 def city_tier(city) -> int:
     city = city.capitalize()
     if city in tier_1_cities:
-        return "1"
+        return "3"
     elif city in tier_2_cities:
         return "2"
     else:
-        return "3"
+        return "1"
     
 df["bmi"] = df[["weight", "height"]].apply(lambda x: bmi(x[0], x[1]), axis=1)
 df["lifestyle_risk"] = df[["smoker", "bmi"]].apply(lambda x: lifestyle_risk(x[0], x[1]), axis = 1)
